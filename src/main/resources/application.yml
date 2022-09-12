@@ -1,3 +1,32 @@
 logging:
   level:
     "com.waveinformatica.demo": DEBUG
+
+server:
+  port: 8080
+  error:
+    include-message: always
+
+demo:
+  rest:
+    markets:
+      limit: 3
+  gruppo:
+    esempio: pippo
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+server:
+  port: 9090
+
+demo:
+  gruppo:
+    esempio: pluto
+    s: ${DB_PASSWD}
+
+  job:
+    period: 60000
