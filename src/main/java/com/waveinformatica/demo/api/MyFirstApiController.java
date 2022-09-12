@@ -1,5 +1,7 @@
 package com.waveinformatica.demo.api;
 
+import com.waveinformatica.demo.dto.ListOfItems;
+import com.waveinformatica.demo.dto.MarketDTO;
 import com.waveinformatica.demo.services.MarketService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,31 +21,42 @@ public class MyFirstApiController {
     private MarketService marketService;
 
     @GetMapping("/markets")
-    public String findMarkets(@RequestParam(value = "prefix", required = false) String prefix) {
-        final Collection<String> markets = marketService.listMarkets();
+    public ListOfItems<MarketDTO> findMarkets(@RequestParam(value = "prefix", required = false) String prefix) {
+        final Collection<MarketDTO> markets = marketService.listMarkets();
 
-        final List<String> filteredMarkets = new ArrayList<>();
-        for (String m : markets) {
-            if (prefix == null || m.startsWith(prefix)) {
+        final List<MarketDTO> filteredMarkets = new ArrayList<>();
+        for (MarketDTO m : markets) {
+            if (prefix == null || (m.getName() != null && m.getName().startsWith(prefix))) {
                 filteredMarkets.add(m);
             }
         }
 
-        return filteredMarkets.toString();
+        return new ListOfItems<>(filteredMarkets);
+    }
+
+    @GetMapping("/markets/{id}")
+    public MarketDTO getMarket(@PathVariable long id) {
+        MarketDTO result = marketService.getMarket(id);
+        if (result == null) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                String.format("Market '%s' not found", id));
+        }
+        return result;
     }
 
     @PostMapping("/markets")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addMarket(@RequestBody final String s) {
-        log.info("Got market {}", s);
-        if (!marketService.addMarket(s)) {
+    public void addMarket(@RequestBody final MarketDTO m) {
+        log.info("Got market {}", m);
+        if (!marketService.addMarket(m)) {
             throw new ResponseStatusException(HttpStatus.INSUFFICIENT_STORAGE);
         }
     }
 
     @DeleteMapping("/markets/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMarket(@PathVariable String id) {
+    public void deleteMarket(@PathVariable long id) {
         if (!marketService.deleteMarket(id)) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,

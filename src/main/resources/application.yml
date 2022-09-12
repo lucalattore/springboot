@@ -10,7 +10,7 @@ server:
 demo:
   rest:
     markets:
-      limit: 3
+      limit: 3000
   gruppo:
     esempio: pippo
 
