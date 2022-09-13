@@ -9,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @RestController
 @Slf4j
@@ -22,14 +20,9 @@ public class MyFirstApiController {
 
     @GetMapping("/markets")
     public ListOfItems<MarketDTO> findMarkets(@RequestParam(value = "prefix", required = false) String prefix) {
-        final Collection<MarketDTO> markets = marketService.listMarkets();
-
-        final List<MarketDTO> filteredMarkets = new ArrayList<>();
-        for (MarketDTO m : markets) {
-            if (prefix == null || (m.getName() != null && m.getName().startsWith(prefix))) {
-                filteredMarkets.add(m);
-            }
-        }
+        final Collection<MarketDTO> filteredMarkets = prefix == null
+            ? marketService.listMarkets()
+            : marketService.findMarkets(prefix);
 
         return new ListOfItems<>(filteredMarkets);
     }
@@ -50,7 +43,7 @@ public class MyFirstApiController {
     public void addMarket(@RequestBody final MarketDTO m) {
         log.info("Got market {}", m);
         if (!marketService.addMarket(m)) {
-            throw new ResponseStatusException(HttpStatus.INSUFFICIENT_STORAGE);
+            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED);
         }
     }
 
