@@ -56,4 +56,21 @@ public class MyFirstApiController {
                 String.format("Market '%d' not found", id));
         }
     }
+
+    @RequestMapping(value = "/markets/{id}", method = {RequestMethod.PUT, RequestMethod.PATCH})
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateMarket(@PathVariable long id, @RequestBody final MarketDTO m) {
+        if (m.getId() != 0 && m.getId() != id) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                String.format("Market id '%d' does not match with '%d'", m.getId(), id));
+        }
+
+        m.setId(id);
+        if (!marketService.updateMarket(m)) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                String.format("Market '%d' not found", id));
+        }
+    }
 }

@@ -51,4 +51,10 @@ public class InMemoryMarketService implements MarketService {
     public boolean deleteMarket(long m) {
         return this.marketMap.remove(m) != null;
     }
+
+    @Override
+    public boolean updateMarket(MarketDTO m) {
+        //TODO: not implemented
+        return false;
+    }
 }

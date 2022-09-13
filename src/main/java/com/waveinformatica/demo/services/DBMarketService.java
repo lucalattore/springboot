@@ -131,4 +131,33 @@ public class DBMarketService implements MarketService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public boolean updateMarket(MarketDTO m) {
+        log.debug("Updating market {}", m.getId());
+        try (Connection conn = ds.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                String sql = "update markets set name = ? where code = ?";
+                boolean updated;
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    stmt.setString(1, m.getName());
+                    stmt.setLong(2, m.getId());
+                    updated = stmt.executeUpdate() != 0;
+                }
+
+                conn.commit();
+                return updated;
+            } catch (Throwable e) {
+                log.error("Got error updating market {}: {}", m.getId(), e.getMessage());
+                conn.rollback();
+                throw e;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

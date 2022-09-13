@@ -10,4 +10,5 @@ public interface MarketService {
     MarketDTO getMarket(long id);
     boolean addMarket(MarketDTO m);
     boolean deleteMarket(long id);
+    boolean updateMarket(MarketDTO m);
 }
