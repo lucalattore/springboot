@@ -29,7 +29,7 @@ public class DBMarketService implements MarketService {
     public Collection<MarketDTO> findMarkets(String prefix) {
         final List<MarketDTO> markets = new ArrayList<>();
         try (Connection conn = ds.getConnection()) {
-            String sql = "select code,name from markets" + (prefix == null ? "" : " where name like ?");
+            String sql = "select code,name,area from markets" + (prefix == null ? "" : " where name like ?");
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 if (prefix != null) {
                     stmt.setString(1, prefix + "%");
@@ -40,6 +40,7 @@ public class DBMarketService implements MarketService {
                         MarketDTO m = new MarketDTO();
                         m.setId(rs.getLong("code"));
                         m.setName(rs.getString("name"));
+                        m.setArea(rs.getString("area"));
                         markets.add(m);
                     }
                 }
@@ -54,7 +55,7 @@ public class DBMarketService implements MarketService {
     @Override
     public MarketDTO getMarket(long id) {
         try (Connection conn = ds.getConnection()) {
-            String sql = "select code,name from markets where code = ?";
+            String sql = "select code,name,area from markets where code = ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setLong(1, id);
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -62,6 +63,7 @@ public class DBMarketService implements MarketService {
                         MarketDTO m = new MarketDTO();
                         m.setId(rs.getLong("code"));
                         m.setName(rs.getString("name"));
+                        m.setArea(rs.getString("area"));
                         return m;
                     }
 
@@ -78,10 +80,11 @@ public class DBMarketService implements MarketService {
         try (Connection conn = ds.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                String sql = "insert into markets (code,name) values (?,?)";
+                String sql = "insert into markets (code,name,area) values (?,?,?)";
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                     stmt.setLong(1, m.getId());
                     stmt.setString(2, m.getName());
+                    stmt.setString(3, m.getArea());
                     stmt.executeUpdate();
                 }
 
@@ -138,11 +141,12 @@ public class DBMarketService implements MarketService {
         try (Connection conn = ds.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                String sql = "update markets set name = ? where code = ?";
+                String sql = "update markets set name = ?, area = ? where code = ?";
                 boolean updated;
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                     stmt.setString(1, m.getName());
-                    stmt.setLong(2, m.getId());
+                    stmt.setString(2, m.getArea());
+                    stmt.setLong(3, m.getId());
                     updated = stmt.executeUpdate() != 0;
                 }
 
