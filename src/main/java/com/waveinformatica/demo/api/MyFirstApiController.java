@@ -40,7 +40,7 @@ public class MyFirstApiController {
         if (result == null) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
-                String.format("Market '%s' not found", id));
+                String.format("Market '%d' not found", id));
         }
         return result;
     }
@@ -60,7 +60,7 @@ public class MyFirstApiController {
         if (!marketService.deleteMarket(id)) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
-                String.format("Market '%s' not found", id));
+                String.format("Market '%d' not found", id));
         }
     }
 }

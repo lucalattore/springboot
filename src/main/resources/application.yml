@@ -14,6 +14,12 @@ demo:
   gruppo:
     esempio: pippo
 
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/mydb?allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: mysql
+
 ---
 spring:
   config:
