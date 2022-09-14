@@ -1,5 +1,6 @@
 package com.waveinformatica.demo.api;
 
+import com.waveinformatica.demo.dto.EditableMarketDTO;
 import com.waveinformatica.demo.dto.ListOfItems;
 import com.waveinformatica.demo.dto.MarketDTO;
 import com.waveinformatica.demo.services.MarketService;
@@ -57,7 +58,7 @@ public class MyFirstApiController {
         }
     }
 
-    @RequestMapping(value = "/markets/{id}", method = {RequestMethod.PUT, RequestMethod.PATCH})
+    @RequestMapping(value = "/markets/{id}", method = {RequestMethod.PUT/*, RequestMethod.PATCH*/})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateMarket(@PathVariable long id, @RequestBody final MarketDTO m) {
         if (m.getId() != 0 && m.getId() != id) {
@@ -68,6 +69,17 @@ public class MyFirstApiController {
 
         m.setId(id);
         if (!marketService.updateMarket(m)) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                String.format("Market '%d' not found", id));
+        }
+    }
+
+    @PatchMapping("/markets/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void patchMarket(@PathVariable long id, @RequestBody final EditableMarketDTO m) {
+        log.debug("Market: {}", m);
+        if (!marketService.updateMarket(id, m)) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 String.format("Market '%d' not found", id));

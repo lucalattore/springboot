@@ -1,5 +1,6 @@
 package com.waveinformatica.demo.services;
 
+import com.waveinformatica.demo.dto.EditableMarketDTO;
 import com.waveinformatica.demo.dto.MarketDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,6 +155,65 @@ public class DBMarketService implements MarketService {
                 return updated;
             } catch (Throwable e) {
                 log.error("Got error updating market {}: {}", m.getId(), e.getMessage());
+                conn.rollback();
+                throw e;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean updateMarket(long id, EditableMarketDTO m) {
+        log.debug("Patching market {}", id);
+        try (Connection conn = ds.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                String sql = "update markets set";
+                //aggiungere campi da modificare
+
+                int c = 0;
+                if (m.getName() != null) {
+                    sql += " name = ?";
+                    c++;
+                }
+
+                if (m.getArea() != null) {
+                    if (c > 0) {
+                        sql += ",";
+                    }
+                    sql += " area = ?";
+                    c++;
+                }
+
+                sql += " where code = ?";
+
+
+                boolean updated;
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    c = 0;
+                    if (m.getName() != null) {
+                        c++;
+                        stmt.setString(c, m.getName().isPresent() ? m.getName().get() : null);
+                    }
+
+                    if (m.getArea() != null) {
+                        c++;
+                        stmt.setString(c, m.getArea().isPresent() ? m.getArea().get() : null);
+                    }
+
+                    c++;
+                    stmt.setLong(c, id);
+                    updated = stmt.executeUpdate() != 0;
+                }
+
+                conn.commit();
+                return updated;
+            } catch (Throwable e) {
+                log.error("Got error patching market {}: {}", id, e.getMessage());
                 conn.rollback();
                 throw e;
             }

@@ -1,5 +1,6 @@
 package com.waveinformatica.demo.services;
 
+import com.waveinformatica.demo.dto.EditableMarketDTO;
 import com.waveinformatica.demo.dto.MarketDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,12 @@ public class InMemoryMarketService implements MarketService {
 
     @Override
     public boolean updateMarket(MarketDTO m) {
+        //TODO: not implemented
+        return false;
+    }
+
+    @Override
+    public boolean updateMarket(long id, EditableMarketDTO m) {
         //TODO: not implemented
         return false;
     }
