@@ -12,6 +12,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Primary
@@ -166,6 +168,13 @@ public class DBMarketService implements MarketService {
         }
     }
 
+    private <T> void fillUpdateSet(String k, Optional<T> v, final List<String> setStringList, final List<Object> params) {
+        if (v != null) {
+            setStringList.add(String.format(" %s = ?", k));
+            params.add(v.isPresent() ? v.get() : null);
+        }
+    }
+
     @Override
     public boolean updateMarket(long id, EditableMarketDTO m) {
         log.debug("Patching market {}", id);
@@ -174,7 +183,7 @@ public class DBMarketService implements MarketService {
             try {
                 String sql = "update markets set";
                 //aggiungere campi da modificare
-
+                /*
                 int c = 0;
                 if (m.getName() != null) {
                     sql += " name = ?";
@@ -188,18 +197,32 @@ public class DBMarketService implements MarketService {
                     sql += " area = ?";
                     c++;
                 }
+                */
+
+                List<String> setStringList = new ArrayList<>();
+                List<Object> params = new ArrayList<>();
+
+                fillUpdateSet("name", m.getName(), setStringList, params);
+                fillUpdateSet("area", m.getArea(), setStringList, params);
+
+                if (params.isEmpty()) {
+                    return true;
+                }
+
+                sql += setStringList.stream().collect(Collectors.joining(","));
+                //equivalente a sql += Strings.join(setStringList, ',');
 
                 sql += " where code = ?";
 
-
                 boolean updated;
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    /*
                     c = 0;
                     if (m.getName() != null) {
                         c++;
                         stmt.setString(c, m.getName().isPresent() ? m.getName().get() : null);
                     }
-
+                    
                     if (m.getArea() != null) {
                         c++;
                         stmt.setString(c, m.getArea().isPresent() ? m.getArea().get() : null);
@@ -207,6 +230,11 @@ public class DBMarketService implements MarketService {
 
                     c++;
                     stmt.setLong(c, id);
+                    */
+                    for (int i = 0; i<params.size(); i++) {
+                        stmt.setObject(i+1, params.get(i));
+                    }
+                    stmt.setLong(params.size() + 1, id);
                     updated = stmt.executeUpdate() != 0;
                 }
 
