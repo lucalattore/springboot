@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 public class PeopleApiController {
 
@@ -21,6 +23,11 @@ public class PeopleApiController {
         }
 
         peopleService.addPerson(p);
+    }
+
+    @GetMapping("/people")
+    public List<Person> findPeople(@RequestParam(value = "lastName", required = false) String lastName) {
+        return peopleService.findPeople(lastName);
     }
 
     @GetMapping("/people/{id}")
