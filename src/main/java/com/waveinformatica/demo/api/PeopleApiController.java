@@ -4,10 +4,7 @@ import com.waveinformatica.demo.entities.Person;
 import com.waveinformatica.demo.services.PeopleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -24,5 +21,14 @@ public class PeopleApiController {
         }
 
         peopleService.addPerson(p);
+    }
+
+    @GetMapping("/people/{id}")
+    public Person getPerson(@PathVariable("id") long id) {
+        Person p = peopleService.getPerson(id);
+        if (p == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Person not found");
+        }
+        return p;
     }
 }

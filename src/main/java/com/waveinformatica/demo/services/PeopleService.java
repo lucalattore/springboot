@@ -14,4 +14,10 @@ public class PeopleService {
     public void addPerson(Person p) {
         personRepository.save(p);
     }
+
+    public Person getPerson(long id) {
+//        Optional<Person> p = personRepository.findById(id);
+//        return p.isPresent() ? p.get() : null;
+        return personRepository.findById(id).orElse(null);
+    }
 }
