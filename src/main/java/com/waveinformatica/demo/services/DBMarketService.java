@@ -222,7 +222,7 @@ public class DBMarketService implements MarketService {
                         c++;
                         stmt.setString(c, m.getName().isPresent() ? m.getName().get() : null);
                     }
-                    
+
                     if (m.getArea() != null) {
                         c++;
                         stmt.setString(c, m.getArea().isPresent() ? m.getArea().get() : null);
