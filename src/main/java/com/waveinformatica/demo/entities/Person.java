@@ -1,6 +1,8 @@
 package com.waveinformatica.demo.entities;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "people")
@@ -16,7 +18,14 @@ public class Person {
     @Column(name = "last_name")
     private String lastName;
 
+    @ManyToOne
+    private Department department;
+
+    @ManyToMany(mappedBy = "students", fetch = FetchType.LAZY)
+    private final List<Course> courses;
+
     public Person() {
+        this.courses = new ArrayList<>();
     }
 
     public Long getId() {
@@ -41,5 +50,17 @@ public class Person {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
     }
 }
