@@ -38,4 +38,12 @@ public class PeopleApiController {
         }
         return p;
     }
+
+    @DeleteMapping("/people/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePerson(@PathVariable("id") long id) {
+        if (!peopleService.deletePerson(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Person not found");
+        }
+    }
 }

@@ -38,4 +38,15 @@ public class PeopleService {
         }
         return foundPeople;
     }
+
+    public boolean deletePerson(long id) {
+        //personRepository.deleteById(id);
+        return personRepository
+            .findById(id)
+            .map(p -> {
+                personRepository.delete(p);
+                return true;
+            })
+            .orElse(false);
+    }
 }
