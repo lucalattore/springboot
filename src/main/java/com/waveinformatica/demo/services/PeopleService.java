@@ -1,5 +1,6 @@
 package com.waveinformatica.demo.services;
 
+import com.waveinformatica.demo.dto.EditablePersonDTO;
 import com.waveinformatica.demo.entities.Person;
 import com.waveinformatica.demo.repositories.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PeopleService {
@@ -48,5 +50,46 @@ public class PeopleService {
                 return true;
             })
             .orElse(false);
+    }
+
+    public boolean update(Person p) {
+        Optional<Person> foundPerson = personRepository.findById(p.getId());
+        if (!foundPerson.isPresent()) {
+            return false;
+        }
+
+        // Questo è sbagliato perché vuole fare un nuovo insert
+        // personRepository.save(p);
+
+        Person q = foundPerson.get();
+        // nell'oggetto recuperato con jpa dal db aggiorno i valori
+        q.setFirstName(p.getFirstName());
+        q.setLastName(p.getLastName());
+
+        // update
+        personRepository.save(q);
+        return true;
+    }
+
+    public boolean partialUpdate(long id, EditablePersonDTO p) {
+        Optional<Person> foundPerson = personRepository.findById(id);
+        if (!foundPerson.isPresent()) {
+            return false;
+        }
+
+        Person q = foundPerson.get();
+
+        // aggiornare nell'oggetto recuperato da db i soli attributi da modificare
+        if (p.getFirstName() != null) {
+            q.setFirstName(p.getFirstName().orElse(null));
+        }
+
+        if (p.getLastName() != null) {
+            q.setLastName(p.getLastName().orElse(null));
+        }
+
+        // update
+        personRepository.save(q);
+        return false;
     }
 }
