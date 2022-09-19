@@ -90,6 +90,6 @@ public class PeopleService {
 
         // update
         personRepository.save(q);
-        return false;
+        return true;
     }
 }
