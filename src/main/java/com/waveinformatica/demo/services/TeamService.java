@@ -73,4 +73,8 @@ public class TeamService {
 
         teamRepository.save(t);
     }
+
+    public void listAllByScoring() {
+        //TODO: completare 
+    }
 }

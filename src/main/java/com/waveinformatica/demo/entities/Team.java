@@ -29,6 +29,18 @@ public class Team {
     @Column(name = "n_stars")
     private Integer numOfStar;
 
+    @Column(name = "v")
+    private Integer v;
+
+    @Column(name = "p")
+    private Integer p;
+
+    @Column(name = "s")
+    private Integer s;
+
+    @Column(name = "rank")
+    private Integer rank;
+
     @OneToMany(mappedBy = "team")
     private final List<Player> players;
 
