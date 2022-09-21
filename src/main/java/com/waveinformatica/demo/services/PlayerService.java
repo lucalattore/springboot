@@ -7,6 +7,7 @@ import com.waveinformatica.demo.exceptions.InvalidDataException;
 import com.waveinformatica.demo.exceptions.ResourceNotFoundException;
 import com.waveinformatica.demo.repositories.PlayerRepository;
 import com.waveinformatica.demo.repositories.TeamRepository;
+import com.waveinformatica.demo.utils.OptionalUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,17 @@ public class PlayerService {
         }
 
         Player p = foundPlayer.get();
+
+        if (player.getFirstName() != null) {
+            p.setFirstName(OptionalUtils.value(player.getFirstName()));
+        }
+
+        if (player.getLastName() != null) {
+            p.setLastName(OptionalUtils.value(player.getLastName()));
+        }
+
+        //TODO: altri attributi
+
         if (player.getTeam() != null) {
             // cambio squadra
             if (player.getTeam().isEmpty()) {
@@ -48,8 +60,6 @@ public class PlayerService {
                 p.setTeam(foundTeam.get());
             }
         }
-
-        //TODO: check and update other fields
 
         playerRepository.save(p);
     }
