@@ -75,6 +75,6 @@ public class TeamService {
     }
 
     public void listAllByScoring() {
-        //TODO: completare 
+        //TODO: completare
     }
 }

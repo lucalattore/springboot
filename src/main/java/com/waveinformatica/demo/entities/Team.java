@@ -38,7 +38,7 @@ public class Team {
     @Column(name = "s")
     private Integer s;
 
-    @Column(name = "rank")
+    @Column(name = "team_rank")
     private Integer rank;
 
     @OneToMany(mappedBy = "team")
