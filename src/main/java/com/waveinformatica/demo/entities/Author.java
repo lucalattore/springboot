@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "authors")
+@Table(name = "authors", indexes = {
+    @Index(columnList = "lastName,firstName", unique = true)
+})
 public class Author {
 
     @Id
