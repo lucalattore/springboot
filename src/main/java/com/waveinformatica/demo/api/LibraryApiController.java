@@ -10,8 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class LibraryApiController {
@@ -46,5 +45,22 @@ public class LibraryApiController {
         AuthorResultSet result = new AuthorResultSet();
         result.getValues().addAll(foundAuthors);
         return result;
+    }
+
+    public void example() {
+        Map<String,BookDTO> m = new HashMap<>();
+
+        BookDTO b = new BookDTO();
+        b.setOptionalTitle(Optional.of("I pilastri della terra"));
+        b.setOptionalISBN(Optional.of("ABC1234"));
+
+        m.put(b.getOptionalISBN().get(), b);
+
+        //....
+
+        BookDTO x = m.get("ABC1234"); // x sarà proprio l'oggetto b definito sopra
+        // se non esiste un libro con tale isbn ottengo null
+
+
     }
 }
