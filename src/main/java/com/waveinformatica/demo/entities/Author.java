@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "authors", indexes = {
-    @Index(columnList = "lastName,firstName", unique = true)
+    @Index(columnList = "last_name,first_name", unique = true)
 })
 public class Author {
 
