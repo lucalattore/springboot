@@ -91,6 +91,16 @@ public class MasterVerifier {
                 primeMap.put(key, list);
             }
 
+            // alternativa
+//            list = primeMap.compute(key, (k, v) -> {
+//                if (v == null)  {
+//                    v = new LinkedList<>();
+//                    primeMap.put(key, v);
+//                }
+//
+//                return v;
+//            });
+
             list.add(prime);
         }
 
