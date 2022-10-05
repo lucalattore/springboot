@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 @Scope("prototype")
@@ -18,10 +20,20 @@ public class SlaveVerifier implements Runnable {
 
     private final BlockingQueue<Integer> workingQueue;
     private final BlockingQueue<Integer> primeQueue;
+    private final AtomicBoolean masterCompleted;
 
-    public SlaveVerifier(BlockingQueue<Integer> workingQueue, BlockingQueue<Integer> primeQueue) {
+    private final CountDownLatch countDownLatch;
+
+    public SlaveVerifier(
+        BlockingQueue<Integer> workingQueue,
+        BlockingQueue<Integer> primeQueue,
+        AtomicBoolean masterCompleted,
+        CountDownLatch countDownLatch)
+    {
         this.workingQueue = workingQueue;
         this.primeQueue = primeQueue;
+        this.masterCompleted = masterCompleted;
+        this.countDownLatch = countDownLatch;
     }
 
     @Override
@@ -31,7 +43,13 @@ public class SlaveVerifier implements Runnable {
             try {
                 Integer n = workingQueue.poll(10, TimeUnit.SECONDS);
                 if (n == null) {
-                    log.info("Coda vuota. Nulla da fare. Aspetto ancora.");
+                    boolean done = masterCompleted.get();
+                    if (done) {
+                        log.info("Coda vuota. Non arriveranno più numeri");
+                        break;
+                    } else {
+                        log.info("Coda vuota. Nulla da fare. Aspetto ancora.");
+                    }
                 } else {
                     boolean prime = verifier.isPrime(n);
                     log.info("The number {} is {}prime", n, prime ? "" : "NOT ");
@@ -43,6 +61,8 @@ public class SlaveVerifier implements Runnable {
             } catch (InterruptedException e) {
                 log.error(e.getMessage());
             }
-        }
+        } // end while
+        log.info("Terminated");
+        countDownLatch.countDown();
     }
 }

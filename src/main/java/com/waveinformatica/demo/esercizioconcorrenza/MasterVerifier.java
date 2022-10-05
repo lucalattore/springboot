@@ -8,10 +8,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 @Slf4j
@@ -34,8 +32,10 @@ public class MasterVerifier {
     private void init() {
         int s = 10;
         log.info("Inizializzo {} slave", s);
+        AtomicBoolean masterCompleted = new AtomicBoolean(false);
+        CountDownLatch countDownLatch = new CountDownLatch(s);
         for (int i=0; i<s;i++) {
-            SlaveVerifier slave = ctx.getBean(SlaveVerifier.class, workingQueue, primeQueue);
+            SlaveVerifier slave = ctx.getBean(SlaveVerifier.class, workingQueue, primeQueue, masterCompleted, countDownLatch);
             Thread t = new Thread(slave);
             t.start();
             slaveThreads.add(t);
@@ -53,6 +53,14 @@ public class MasterVerifier {
             } catch (InterruptedException e) {
                 log.error(e.getMessage());
             }
+        }
+
+        masterCompleted.set(true);
+        try {
+            countDownLatch.await();
+            log.info("Tutti gli slave hanno finito");
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
         }
 
         log.info("La lista dei numeri primi contiene {} elementi", primeQueue.size());
