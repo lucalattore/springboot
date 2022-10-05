@@ -41,7 +41,7 @@ public class SlaveVerifier implements Runnable {
         while (!Thread.interrupted()) {
             log.info("Estraggo un numero dalla coda");
             try {
-                Integer n = workingQueue.poll(10, TimeUnit.SECONDS);
+                Integer n = workingQueue.poll(5, TimeUnit.SECONDS);
                 if (n == null) {
                     boolean done = masterCompleted.get();
                     if (done) {
@@ -56,7 +56,7 @@ public class SlaveVerifier implements Runnable {
                     if (prime) {
                         primeQueue.offer(n);
                     }
-                    Thread.sleep(10000);
+                    Thread.sleep(1000);
                 }
             } catch (InterruptedException e) {
                 log.error(e.getMessage());

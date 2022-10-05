@@ -6,10 +6,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -64,5 +64,62 @@ public class MasterVerifier {
         }
 
         log.info("La lista dei numeri primi contiene {} elementi", primeQueue.size());
+
+        Map<String,List<Integer>> primeMap = new HashMap<>();
+        while (true) {
+            Integer prime = primeQueue.poll();
+            if (prime == null) {
+                break;
+            }
+
+            // prime contiene un numero primo
+            String primeString = "" + prime;
+            // Forme equivalenti per convertire un numero in stringa
+            // String.format("%d", prime);
+            // String.valueOf(prime);
+
+            // 11, 1... <- "1"
+            // 2 <- "2"
+            // 3, 13, 23... <- "3"
+            // ...
+
+            String key = primeString.substring(primeString.length() - 1);
+            List<Integer> list = primeMap.get(key);
+            if (list == null) {
+                // non abbiamo ancora memorizzato nella mappa alcun elemento con chiave key
+                list = new LinkedList<>();
+                primeMap.put(key, list);
+            }
+
+            list.add(prime);
+        }
+
+        log.info("PRIME MAP: {}", primeMap);
+        // itero le chiavi e ottengo i valori per chiave
+        for (String key : primeMap.keySet()) {
+            List<Integer> list = primeMap.get(key);
+            log.info("KEY {} COUNT {} LIST {}", key, list.size(), list);
+        }
+
+        // itero i valori
+        for (List<Integer> list : primeMap.values()) {
+            log.info("COUNT {} LIST {}", list.size(), list);
+        }
+
+        // itero le entry
+        for (Map.Entry<String,List<Integer>> entry : primeMap.entrySet()) {
+            String key = entry.getKey();
+            List<Integer> list = entry.getValue();
+            log.info("KEY {} COUNT {} LIST {}", key, list.size(), list);
+        }
+
+        // lista delle dimensioni delle liste aggregate di numeri primi
+        List<Integer> sizes = primeMap.keySet()
+            .stream()
+            .map(key -> primeMap.get(key))
+            .map(list -> list.size())
+            .collect(Collectors.toList());
+
+        log.info("SIZES: {}", sizes);
     }
 }
